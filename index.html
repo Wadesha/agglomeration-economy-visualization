@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集聚效益可视化 · 城市规模如何改变你的生活</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --color-small: #95A5A6;
+            --color-medium: #3498DB;
+            --color-large: #F39C12;
+            --color-mega: #E74C3C;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-light: #0f3460;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #e94560;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 2rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e94560, #f39c12, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            animation: fadeInUp 1s ease;
+        }
+        .hero .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+        .hero .tagline {
+            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            color: var(--accent);
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+        .city-selector {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.9s both;
+        }
+        .city-btn {
+            padding: 0.8rem 2rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .city-btn:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .city-btn.active {
+            background: linear-gradient(135deg, var(--accent), #f39c12);
+            border-color: transparent;
+            box-shadow: 0 5px 20px rgba(233,69,96,0.4);
+        }
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            animation: bounce 2s infinite;
+        }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+
+        /* Sections */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        .section-title {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .section-desc {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.2);
+        }
+        .card-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+        .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card-value { font-size: 2rem; font-weight: 900; margin-bottom: 0.3rem; }
+        .card-unit { font-size: 0.85rem; color: var(--text-secondary); }
+        .card-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 0.8rem;
+            overflow: hidden;
+        }
+        .card-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* Chart container */
+        .chart-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        /* AB Panel */
+        .ab-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .ab-side {
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        .ab-left {
+            background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(52,152,219,0.05));
+            border: 1px solid rgba(52,152,219,0.3);
+        }
+        .ab-right {
+            background: linear-gradient(135deg, rgba(231,76,60,0.15), rgba(231,76,60,0.05));
+            border: 1px solid rgba(231,76,60,0.3);
+        }
+        .ab-side h3 { font-size: 1.4rem; margin-bottom: 1rem; }
+        .ab-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .ab-item:last-child { border-bottom: none; }
+        .ab-item-label { font-size: 0.95rem; }
+        .ab-item-value { font-size: 0.9rem; color: var(--text-secondary); }
+        .ab-item-highlight { color: #2ecc71; font-weight: 700; }
+
+        /* Scorecard */
+        .scorecard {
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+        .scorecard table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        .scorecard th {
+            background: rgba(255,255,255,0.08);
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+        .scorecard td {
+            padding: 0.8rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+        .star { letter-spacing: 2px; }
+        .star-low { color: #e74c3c; }
+        .star-mid { color: #f39c12; }
+        .star-high { color: #2ecc71; }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .stat-item { text-align: center; }
+        .stat-number {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e94560, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.3rem; }
+
+        /* Conclusion */
+        .conclusion {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .conclusion h2 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 1.5rem;
+        }
+        .conclusion p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .quote-box {
+            background: rgba(233,69,96,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem 2rem;
+            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+            font-style: italic;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        @media (max-width: 768px) {
+            .ab-panel { grid-template-columns: 1fr; }
+            .stats-bar { gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+    <h1>集聚效益可视化</h1>
+    <p class="subtitle">城市规模如何改变你的生活？<br>从月薪、房租到外卖、孤独感 —— 用数据看见集聚的力量</p>
+    <p class="tagline">200 个模拟城市 · 20+ 生活维度 · 四级城市对比</p>
+    <div class="city-selector">
+        <button class="city-btn active" onclick="scrollToSection('overview')">开始探索</button>
+        <button class="city-btn" onclick="scrollToSection('scorecard')">查看计分卡</button>
+        <button class="city-btn" onclick="scrollToSection('ab')">小城 vs 大城</button>
+    </div>
+    <div class="scroll-hint">向下滚动 ↓</div>
+</section>
+
+<!-- ===== 数据总览 ===== -->
+<section class="section" id="overview">
+    <h2 class="section-title">一目了然：四类城市关键数据</h2>
+    <p class="section-desc">从小县城到一线城市，集聚效益在每个维度的表现</p>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number">3.7x</div>
+            <div class="stat-label">月薪差距 (一线 vs 县城)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10x</div>
+            <div class="stat-label">房租差距</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">86x</div>
+            <div class="stat-label">创新活动差距</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">β=1.12</div>
+            <div class="stat-label">标度律指数 (>1 即集聚效益)</div>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card" style="border-left: 4px solid var(--color-small);">
+            <div class="card-icon">🏘️</div>
+            <div class="card-title">小县城 (20万人)</div>
+            <div class="card-value">3,500<span class="card-unit"> 元/月</span></div>
+            <div class="card-unit">月薪 · 通勤15分钟 · 房租500元</div>
+            <div class="card-bar"><div class="card-bar-fill" style="width:27%;background:var(--color-small);"></div></div>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--color-medium);">
+            <div class="card-icon">🏙️</div>
+            <div class="card-title">地级市 (200万人)</div>
+            <div class="card-value">5,500<span class="card-unit"> 元/月</span></div>
+            <div class="card-unit">月薪 · 通勤28分钟 · 房租1,200元</div>
+            <div class="card-bar"><div class="card-bar-fill" style="width:42%;background:var(--color-medium);"></div></div>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--color-large);">
+            <div class="card-icon">🌆</div>
+            <div class="card-title">省会城市 (800万人)</div>
+            <div class="card-value">8,500<span class="card-unit"> 元/月</span></div>
+            <div class="card-unit">月薪 · 通勤40分钟 · 房租2,500元</div>
+            <div class="card-bar"><div class="card-bar-fill" style="width:65%;background:var(--color-large);"></div></div>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--color-mega);">
+            <div class="card-icon">🌃</div>
+            <div class="card-title">一线城市 (2000万+)</div>
+            <div class="card-value">13,000<span class="card-unit"> 元/月</span></div>
+            <div class="card-unit">月薪 · 通勤55分钟 · 房租5,000元</div>
+            <div class="card-bar"><div class="card-bar-fill" style="width:100%;background:var(--color-mega);"></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 标度律 ===== -->
+<section class="section" id="scaling">
+    <h2 class="section-title">城市标度律：人口越多，产出"超比例"增长</h2>
+    <p class="section-desc">β > 1 意味着城市人口每增长1%，经济产出增长超过1% —— 这就是集聚效益的核心证据</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartScaling"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== 雷达图 ===== -->
+<section class="section" id="radar">
+    <h2 class="section-title">生活体验雷达图</h2>
+    <p class="section-desc">六维度对比：城市越大，生活越便利，但通勤时间也越长</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartRadar"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== 收入vs房租 ===== -->
+<section class="section" id="income">
+    <h2 class="section-title">月薪 vs 房租：赚得多，花得也多</h2>
+    <p class="section-desc">大城市月薪是县城的3.7倍，但房租是10倍 —— 每月能存下多少钱？</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartIncome"></canvas></div>
+    </div>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">💰</div>
+            <div class="card-title">小县城每月可存</div>
+            <div class="card-value" style="color:#3498DB;">1,500<span class="card-unit"> 元</span></div>
+            <div class="card-unit">月薪3,500 - 房租500 - 生活费1,500</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">💰</div>
+            <div class="card-title">地级市每月可存</div>
+            <div class="card-value" style="color:#2ecc71;">2,300<span class="card-unit"> 元</span></div>
+            <div class="card-unit">月薪5,500 - 房租1,200 - 生活费2,000</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">💰</div>
+            <div class="card-title">省会城市每月可存</div>
+            <div class="card-value" style="color:#f39c12;">3,000<span class="card-unit"> 元</span></div>
+            <div class="card-unit">月薪8,500 - 房租2,500 - 生活费3,000</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">💰</div>
+            <div class="card-title">一线城市每月可存</div>
+            <div class="card-value" style="color:#E74C3C;">4,000<span class="card-unit"> 元</span></div>
+            <div class="card-unit">月薪13,000 - 房租5,000 - 生活费4,000</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 便利vs通勤 ===== -->
+<section class="section" id="convenience">
+    <h2 class="section-title">"痛并快乐着"：便利 vs 通勤</h2>
+    <p class="section-desc">生活便利指数随城市规模上升，但通勤时间也在增加 —— 你愿意用多少时间换多少便利？</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartConvenience"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== AB面对比 ===== -->
+<section class="section" id="ab">
+    <h2 class="section-title">集聚效益的"AB面"</h2>
+    <p class="section-desc">小县城和大城市各有所长 —— 没有绝对的好坏，只有不同的取舍</p>
+    <div class="ab-panel">
+        <div class="ab-side ab-left">
+            <h3>🏘️ 小县城更胜一筹</h3>
+            <div class="ab-item"><span class="ab-item-label">通勤时间短</span><span class="ab-item-value">15分钟 vs 55分钟</span></div>
+            <div class="ab-item"><span class="ab-item-label">房租便宜</span><span class="ab-item-value">500元 vs 5,000元</span></div>
+            <div class="ab-item"><span class="ab-item-label">停车方便</span><span class="ab-item-value">3分钟 vs 25分钟</span></div>
+            <div class="ab-item"><span class="ab-item-label">邻里更熟</span><span class="ab-item-value">3次/月 vs 0.5次/月</span></div>
+            <div class="ab-item"><span class="ab-item-label">人均公园多</span><span class="ab-item-value">15㎡ vs 8㎡</span></div>
+            <div class="ab-item"><span class="ab-item-label">孤独感更低</span><span class="ab-item-value">3.0/10 vs 6.5/10</span></div>
+        </div>
+        <div class="ab-side ab-right">
+            <h3>🌃 一线城市更胜一筹</h3>
+            <div class="ab-item"><span class="ab-item-label">月薪更高</span><span class="ab-item-value">13,000元 vs 3,500元</span></div>
+            <div class="ab-item"><span class="ab-item-label">外卖更快</span><span class="ab-item-value">26分钟 vs 45分钟</span></div>
+            <div class="ab-item"><span class="ab-item-label">医疗更好</span><span class="ab-item-value">40家三甲 vs 0家</span></div>
+            <div class="ab-item"><span class="ab-item-label">娱乐更多</span><span class="ab-item-value">25场/月 vs 0.2场/月</span></div>
+            <div class="ab-item"><span class="ab-item-label">包邮率高</span><span class="ab-item-value">95% vs 40%</span></div>
+            <div class="ab-item"><span class="ab-item-label">跳槽机会多</span><span class="ab-item-value">80岗位 vs 5岗位</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 孤独感悖论 ===== -->
+<section class="section" id="loneliness">
+    <h2 class="section-title">集聚悖论：人越多，越孤独？</h2>
+    <p class="section-desc">微信好友从30人增加到80人，但每周见面的朋友却从5人减少到2.5人</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartLoneliness"></canvas></div>
+    </div>
+    <div class="quote-box">
+        "城市里有800万人，但你可能一周都见不到一个朋友。<br>集聚让选择变多，却也让关系变浅。"
+    </div>
+</section>
+
+<!-- ===== 夜生活 ===== -->
+<section class="section" id="nightlife">
+    <h2 class="section-title">夜生活集聚：城市越大，夜越精彩</h2>
+    <p class="section-desc">一线城市每3家店就有1家深夜营业，小县城凌晨两点只有路灯</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartNightlife"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== 医疗教育 ===== -->
+<section class="section" id="health-edu">
+    <h2 class="section-title">医疗与教育：资源红利 vs 竞争焦虑</h2>
+    <p class="section-desc">集聚带来顶级资源，也带来顶级竞争 —— 学区房溢价一线城市达12,000元/㎡</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartHealthEdu"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== 菜市场经济学 ===== -->
+<section class="section" id="food">
+    <h2 class="section-title">菜市场经济学：集聚让大城市更便宜？</h2>
+    <p class="section-desc">物流集聚效应使一线城市猪肉反而比小县城便宜，蔬菜种类多3倍</p>
+    <div class="chart-container">
+        <div class="chart-wrapper"><canvas id="chartFood"></canvas></div>
+    </div>
+</section>
+
+<!-- ===== 计分卡 ===== -->
+<section class="section" id="scorecard">
+    <h2 class="section-title">人生选择计分卡</h2>
+    <p class="section-desc">12个维度加权打分 —— 按你的价值观，哪里更适合你？</p>
+    <div class="scorecard">
+        <table>
+            <thead>
+                <tr>
+                    <th>维度</th>
+                    <th>权重</th>
+                    <th>小县城</th>
+                    <th>评分</th>
+                    <th>一线城市</th>
+                    <th>评分</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>月薪收入</td><td>15%</td><td>3,500元</td><td class="star star-low">★★☆☆☆</td><td>13,000元</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>房租成本</td><td>15%</td><td>500元</td><td class="star star-high">★★★★★</td><td>5,000元</td><td class="star star-low">★☆☆☆☆</td></tr>
+                <tr><td>通勤体验</td><td>10%</td><td>15分钟</td><td class="star star-high">★★★★★</td><td>55分钟</td><td class="star star-low">★★☆☆☆</td></tr>
+                <tr><td>医疗资源</td><td>10%</td><td>0家三甲</td><td class="star star-low">★☆☆☆☆</td><td>40家三甲</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>教育机会</td><td>10%</td><td>0所985</td><td class="star star-low">★☆☆☆☆</td><td>8所985</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>生活便利</td><td>10%</td><td>基础满足</td><td class="star star-low">★★☆☆☆</td><td>应有尽有</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>夜生活/娱乐</td><td>8%</td><td>0.2场/月</td><td class="star star-low">★☆☆☆☆</td><td>25场/月</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>社交圈子</td><td>8%</td><td>熟人社会</td><td class="star star-high">★★★★☆</td><td>2.5人/周</td><td class="star star-low">★★☆☆☆</td></tr>
+                <tr><td>物价水平</td><td>7%</td><td>22元/斤</td><td class="star star-mid">★★★☆☆</td><td>17元/斤</td><td class="star star-high">★★★★☆</td></tr>
+                <tr><td>快递/网购</td><td>7%</td><td>4.5天到</td><td class="star star-low">★★☆☆☆</td><td>1.8天到</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>二手交易</td><td>5%</td><td>30天成交</td><td class="star star-low">★☆☆☆☆</td><td>3天成交</td><td class="star star-high">★★★★★</td></tr>
+                <tr><td>宠物友好</td><td>5%</td><td>0.3个场所</td><td class="star star-low">★☆☆☆☆</td><td>20个场所</td><td class="star star-high">★★★★★</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ===== 结论 ===== -->
+<section class="conclusion">
+    <h2>集聚效益没有标准答案</h2>
+    <p>城市越大，收入越高、选择越多、生活越方便 —— 这是集聚的红利。</p>
+    <p>城市越大，房租越贵、通勤越长、人越孤独 —— 这是集聚的代价。</p>
+    <p>每个人都在用自己的选择给集聚效益"投票"。</p>
+    <div class="quote-box">
+        没有绝对正确的答案，只看你更在乎什么。<br>
+        有人在一线城市找到机会，也有人在小县城找到生活。<br>
+        集聚效益的真正意义，不是告诉你"该去哪里"，而是帮你理解"你在用什么换什么"。
+    </div>
+</section>
+
+<footer>
+    集聚效益可视化 · 基于模拟数据 · 200个城市样本 · 20+生活维度<br>
+    数据为模拟生成，用于展示分析框架和方法 · 实际应用可替换为真实数据源
+</footer>
+
+<script>
+// ===== 公共配置 =====
+Chart.defaults.color = '#a0a0b0';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+Chart.defaults.font.family = "'-apple-system','PingFang SC','Microsoft YaHei',sans-serif";
+
+const cityLabels = ['小县城\n(20万)', '地级市\n(200万)', '省会城市\n(800万)', '一线城市\n(2000万+)'];
+const cityColors = ['#95A5A6', '#3498DB', '#F39C12', '#E74C3C'];
+
+// ===== 1. 标度律散点图 =====
+function initScaling() {
+    const ctx = document.getElementById('chartScaling').getContext('2d');
+    // 模拟数据
+    const np = 80;
+    const pops = [], gdps = [];
+    for (let i = 0; i < np; i++) {
+        const p = Math.exp(3.5 + Math.random() * 3);
+        pops.push(p);
+        gdps.push(0.5 * Math.pow(p, 1.12) * Math.exp(Math.random() * 0.3 - 0.15));
+    }
+    const fitX = [20, 3000];
+    const fitY = [0.5 * Math.pow(20, 1.102), 0.5 * Math.pow(3000, 1.102)];
+    const linearY = [0.5 * Math.pow(20, 1.0), 0.5 * Math.pow(3000, 1.0)];
+
+    new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { label: '模拟城市数据', data: pops.map((p,i)=>({x:p,y:gdps[i]})), backgroundColor: 'rgba(233,69,96,0.4)', borderColor: 'rgba(233,69,96,0.6)', pointRadius: 5 },
+                { label: '标度律拟合 β=1.102', data: fitX.map((x,i)=>({x:x,y:fitY[i]})), type: 'line', borderColor: '#e94560', borderWidth: 3, fill: false, pointRadius: 0 },
+                { label: '线性增长 β=1.0 (参考)', data: fitX.map((x,i)=>({x:x,y:linearY[i]})), type: 'line', borderColor: 'gray', borderWidth: 1.5, borderDash: [5,5], fill: false, pointRadius: 0 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                x: { type: 'log', title: { display: true, text: '城市人口 (万人)' } },
+                y: { type: 'log', title: { display: true, text: 'GDP (亿元)' } }
+            },
+            plugins: {
+                title: { display: true, text: 'β = 1.102 > 1 → 城市人口每增长1%，产出增长1.10%', font: { size: 14 } },
+                legend: { position: 'top' }
+            }
+        }
+    });
+}
+
+// ===== 2. 雷达图 =====
+function initRadar() {
+    const ctx = document.getElementById('chartRadar').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['外卖速度\n(快=好)', '收入水平', '娱乐选择', '社交机会', '生活便利', '通勤时间\n(短=好)'],
+            datasets: [
+                { label: '小县城', data: [20, 27, 5, 10, 15, 73], backgroundColor: 'rgba(149,165,166,0.2)', borderColor: '#95A5A6', borderWidth: 2, pointBackgroundColor: '#95A5A6' },
+                { label: '地级市', data: [40, 42, 30, 30, 40, 49], backgroundColor: 'rgba(52,152,219,0.2)', borderColor: '#3498DB', borderWidth: 2, pointBackgroundColor: '#3498DB' },
+                { label: '省会城市', data: [65, 65, 75, 60, 75, 27], backgroundColor: 'rgba(243,156,18,0.2)', borderColor: '#F39C12', borderWidth: 2, pointBackgroundColor: '#F39C12' },
+                { label: '一线城市', data: [85, 100, 100, 100, 90, 9], backgroundColor: 'rgba(231,76,60,0.2)', borderColor: '#E74C3C', borderWidth: 2, pointBackgroundColor: '#E74C3C' },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } } },
+            plugins: { title: { display: true, text: '六维度生活体验对比 (0-100分)', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 3. 收入 vs 房租 =====
+function initIncome() {
+    const ctx = document.getElementById('chartIncome').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '平均月薪', data: [3500, 5500, 8500, 13000], backgroundColor: 'rgba(46,204,113,0.7)', borderRadius: 8 },
+                { label: '月租(一居室)', data: [500, 1200, 2500, 5000], backgroundColor: 'rgba(231,76,60,0.7)', borderRadius: 8 },
+                { label: '每月可存钱', data: [1500, 2300, 3000, 4000], backgroundColor: 'rgba(243,156,18,0.7)', borderRadius: 8 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, title: { display: true, text: '元/月' } } },
+            plugins: { title: { display: true, text: '月薪涨3.7倍，房租涨10倍 —— 你的钱去哪了？', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 4. 便利 vs 通勤 =====
+function initConvenience() {
+    const ctx = document.getElementById('chartConvenience').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '生活便利指数 (0-100)', data: [15, 40, 65, 85], backgroundColor: 'rgba(52,152,219,0.7)', borderRadius: 8, yAxisID: 'y' },
+                { label: '通勤时间 (分钟)', data: [15, 28, 40, 55], type: 'line', borderColor: '#E74C3C', borderWidth: 3, yAxisID: 'y1', tension: 0.3, pointRadius: 8 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 100, position: 'left', title: { display: true, text: '便利指数' } },
+                y1: { beginAtZero: true, max: 60, position: 'right', title: { display: true, text: '通勤(分钟)' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { title: { display: true, text: '便利↑ 通勤↑ —— 痛并快乐着', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 5. 孤独感悖论 =====
+function initLoneliness() {
+    const ctx = document.getElementById('chartLoneliness').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '微信活跃联系人', data: [30, 50, 70, 80], backgroundColor: 'rgba(52,152,219,0.3)', borderRadius: 8, yAxisID: 'y' },
+                { label: '每周见面朋友', data: [5, 4, 3, 2.5], type: 'line', borderColor: '#E74C3C', borderWidth: 3, yAxisID: 'y1', tension: 0.3, pointRadius: 8 },
+                { label: '孤独感评分 (1-10)', data: [3, 4, 5.5, 6.5], type: 'line', borderColor: '#2ECC71', borderWidth: 3, borderDash: [5,5], yAxisID: 'y1', tension: 0.3, pointRadius: 8 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 100, position: 'left', title: { display: true, text: '联系人(人)' } },
+                y1: { beginAtZero: true, max: 10, position: 'right', title: { display: true, text: '朋友/孤独感' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { title: { display: true, text: '联系人↑ 朋友↓ 孤独感↑ —— 集聚悖论', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 6. 夜生活 =====
+function initNightlife() {
+    const ctx = document.getElementById('chartNightlife').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '酒吧密度 (家/km²)', data: [0.1, 0.8, 3, 8], backgroundColor: 'rgba(155,89,182,0.7)', borderRadius: 8 },
+                { label: '深夜营业比例 (%)', data: [2, 8, 20, 35], backgroundColor: 'rgba(243,156,18,0.7)', borderRadius: 8 },
+                { label: '24h便利店 (家/km²)', data: [0.5, 3, 10, 25], backgroundColor: 'rgba(231,76,60,0.7)', borderRadius: 8 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, title: { display: true, text: '密度 / 比例' } } },
+            plugins: { title: { display: true, text: '城市越大，夜越精彩', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 7. 医疗教育 =====
+function initHealthEdu() {
+    const ctx = document.getElementById('chartHealthEdu').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '三甲医院数', data: [0, 3, 15, 40], backgroundColor: 'rgba(231,76,60,0.7)', borderRadius: 8, yAxisID: 'y' },
+                { label: '学区房溢价 (元/㎡, ÷1000)', data: [0.5, 2, 5, 12], backgroundColor: 'rgba(243,156,18,0.7)', borderRadius: 8, yAxisID: 'y' },
+                { label: '补习班密度 (家/万人)', data: [1.5, 5, 12, 20], backgroundColor: 'rgba(155,89,182,0.7)', borderRadius: 8, yAxisID: 'y' },
+                { label: '985/211大学数', data: [0, 0.2, 3, 8], backgroundColor: 'rgba(52,152,219,0.7)', borderRadius: 8, yAxisID: 'y' },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, position: 'left', title: { display: true, text: '数量 / 溢价(千元)' } } },
+            plugins: { title: { display: true, text: '资源好但竞争也激烈 —— 医疗教育资源集聚', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 8. 菜市场经济学 =====
+function initFood() {
+    const ctx = document.getElementById('chartFood').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['小县城', '地级市', '省会城市', '一线城市'],
+            datasets: [
+                { label: '猪肉价格 (元/斤)', data: [22, 20, 18, 17], backgroundColor: 'rgba(231,76,60,0.7)', borderRadius: 8, yAxisID: 'y' },
+                { label: '蔬菜种类 (种)', data: [30, 50, 80, 100], type: 'line', borderColor: '#2ECC71', borderWidth: 3, yAxisID: 'y1', tension: 0.3, pointRadius: 8 },
+                { label: '生鲜电商覆盖率 (%)', data: [15, 50, 85, 98], type: 'line', borderColor: '#3498DB', borderWidth: 3, yAxisID: 'y1', tension: 0.3, pointRadius: 8 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 25, position: 'left', title: { display: true, text: '猪肉(元/斤)' } },
+                y1: { beginAtZero: true, max: 120, position: 'right', title: { display: true, text: '种类 / 覆盖率(%)' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { title: { display: true, text: '大城市猪肉反而更便宜 —— 物流集聚效应', font: { size: 14 } } }
+        }
+    });
+}
+
+// ===== 滚动 =====
+function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 初始化所有图表 =====
+window.addEventListener('DOMContentLoaded', () => {
+    initScaling();
+    initRadar();
+    initIncome();
+    initConvenience();
+    initLoneliness();
+    initNightlife();
+    initHealthEdu();
+    initFood();
+});
+
+// ===== 滚动动画 =====
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.section, .conclusion').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    observer.observe(el);
+});
+</script>
+
+</body>
+</html>
