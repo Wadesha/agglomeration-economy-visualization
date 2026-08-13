@@ -1,4 +1,4 @@
-> **在线体验**: https://your-username.github.io/agglomeration-economy-visualization/
+> **在线体验**: https://wadesha.github.io/agglomeration-economy-visualization/
 
 # 集聚效益可视化
 
@@ -77,7 +77,7 @@
 
 ### 本地运行
 ```bash
-git clone https://github.com/your-username/agglomeration-economy-visualization.git
+git clone https://github.com/Wadesha/agglomeration-economy-visualization.git
 cd agglomeration-economy-visualization
 # 方式1: 用浏览器直接打开 index.html
 # 方式2: 启动本地服务器
