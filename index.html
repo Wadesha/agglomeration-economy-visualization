@@ -279,9 +279,188 @@
             font-size: 0.85rem;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
+        /* ========== 知识框架 ========== */
+        .framework-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: relative;
+            margin: 2rem 0;
+        }
+        .framework-layer {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .framework-layer:hover {
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+        .framework-layer-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            user-select: none;
+        }
+        .framework-layer-header .layer-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .framework-layer-header .layer-arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .framework-layer.open .layer-arrow { transform: rotate(180deg); }
+        .framework-layer-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 1.5rem;
+        }
+        .framework-layer.open .framework-layer-body {
+            max-height: 800px;
+            padding: 0 1.5rem 1.5rem;
+        }
+        .framework-layer-body .theory-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .framework-layer-body .theory-item:last-child { border-bottom: none; }
+        .theory-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+        .theory-label { font-size: 0.95rem; font-weight: 600; }
+        .theory-desc { font-size: 0.85rem; color: var(--text-secondary); }
+        .theory-example { font-size: 0.8rem; color: var(--accent); font-style: italic; }
+        .framework-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .framework-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .framework-legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+        /* ========== 数据家族 ========== */
+        .data-family-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .data-tier-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .data-tier-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.15);
+        }
+        .data-tier-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+        }
+        .tier-number {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .tier-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .tier-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.8rem; }
+        .tier-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .tier-stat { font-size: 0.85rem; }
+        .tier-stat strong { color: var(--accent); }
+        .tier-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tier-metric {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+        }
+        .tier-files {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .tier-file {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(233,69,96,0.1);
+            color: var(--accent);
+            margin-right: 0.4rem;
+            margin-bottom: 0.3rem;
+            font-family: monospace;
+        }
+        .data-family-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .data-family-summary-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 1.2rem 0.8rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .data-family-summary-item .num {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .data-family-summary-item .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
         @media (max-width: 768px) {
             .ab-panel { grid-template-columns: 1fr; }
             .stats-bar { gap: 1.5rem; }
+            .framework-legend { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
@@ -291,13 +470,265 @@
 <section class="hero">
     <h1>集聚效益可视化</h1>
     <p class="subtitle">城市规模如何改变你的生活？<br>从月薪、房租到外卖、孤独感 —— 用数据看见集聚的力量</p>
-    <p class="tagline">200 个模拟城市 · 20+ 生活维度 · 四级城市对比</p>
+    <p class="tagline">42,900 条数据 · 5 层级数据家族 · 200 城市 · 20 年 · 100+ 指标</p>
     <div class="city-selector">
-        <button class="city-btn active" onclick="scrollToSection('overview')">开始探索</button>
-        <button class="city-btn" onclick="scrollToSection('scorecard')">查看计分卡</button>
-        <button class="city-btn" onclick="scrollToSection('ab')">小城 vs 大城</button>
+        <button class="city-btn" onclick="scrollToSection('framework')">📐 知识框架</button>
+        <button class="city-btn" onclick="scrollToSection('overview')">📊 开始探索</button>
+        <button class="city-btn" onclick="scrollToSection('data-family')">📦 数据家族</button>
+        <button class="city-btn" onclick="scrollToSection('scorecard')">📋 计分卡</button>
     </div>
     <div class="scroll-hint">向下滚动 ↓</div>
+</section>
+
+<!-- ================================================================== -->
+<!-- ===== 知识框架 ===== -->
+<!-- ================================================================== -->
+<section class="section" id="framework">
+    <h2 class="section-title">集聚效益知识框架</h2>
+    <p class="section-desc">
+        从底层概念到上层应用，6 层知识体系搭建完整的集聚效益理论栈<br>
+        <span style="font-size:0.85rem;color:var(--text-secondary);">
+        Marshall (1890) → Hoover (1937) → Jacobs (1969) → Glaeser (1992) → Bettencourt (2007)
+        </span>
+    </p>
+
+    <!-- 图例 -->
+    <div class="framework-legend">
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#e94560;"></div>基础概念</div>
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#3498DB;"></div>类型分类</div>
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#2ECC71;"></div>核心机制</div>
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#F39C12;"></div>扩展理论</div>
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#9B59B6;"></div>度量指标</div>
+        <div class="framework-legend-item"><div class="framework-legend-dot" style="background:#1ABC9C;"></div>数据家族</div>
+    </div>
+
+    <div class="framework-stack" id="frameworkStack">
+        <!-- Layer 1: 核心概念 -->
+        <div class="framework-layer open">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#e94560;color:white;">1</span>
+                <span>核心概念 —— 什么是集聚效益？</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#e94560;"></div>
+                    <div>
+                        <div class="theory-label">集聚效益 (Agglomeration Economies)</div>
+                        <div class="theory-desc">经济活动在空间上集中产生的额外效益，即"1+1 > 2"效应</div>
+                        <div class="theory-example">例：100 家餐馆开在同一条街，每家生意都比单独开好</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#e94560;"></div>
+                    <div>
+                        <div class="theory-label">理论基础</div>
+                        <div class="theory-desc">Marshall (1890) 提出三大集聚来源 → Hoover (1937) 分类 → Jacobs (1969) 引入多样性</div>
+                        <div class="theory-example">核心思想：距离越近，知识流动越快，匹配成本越低，基础设施越可共享</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#e94560;"></div>
+                    <div>
+                        <div class="theory-label">为什么重要？</div>
+                        <div class="theory-desc">解释城市存在的根本原因 —— 如果不集聚，人为什么要住在城市？</div>
+                        <div class="theory-example">β = 1.102 → 城市人口每增长 1%，产出增长 1.10%，多出的 0.10% 就是集聚效益</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layer 2: 三种集聚类型 -->
+        <div class="framework-layer">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#3498DB;color:white;">2</span>
+                <span>三种集聚类型 —— 从城市到企业</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#3498DB;"></div>
+                    <div>
+                        <div class="theory-label">城市化经济 (Urbanization Economies)</div>
+                        <div class="theory-desc">城市整体规模带来的跨行业效益。城市越大，所有行业都受益</div>
+                        <div class="theory-example">例：大城市有更好的机场、地铁、医院，所有企业都能用 → 共享基础设施</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#3498DB;"></div>
+                    <div>
+                        <div class="theory-label">地方化经济 (Localization Economies)</div>
+                        <div class="theory-desc">同一行业的企业集聚带来的行业内效益。同行扎堆，大家受益</div>
+                        <div class="theory-example">例：硅谷的 IT 集群、义乌的小商品集群、中关村的科技公司 → 共享劳动力池</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#3498DB;"></div>
+                    <div>
+                        <div class="theory-label">内部规模经济 (Internal Scale Economies)</div>
+                        <div class="theory-desc">企业自身规模扩大带来的成本下降。企业做大，成本摊薄</div>
+                        <div class="theory-example">例：工厂产能翻倍，固定成本不变，单位成本下降一半</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layer 3: 三大集聚机制 -->
+        <div class="framework-layer">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#2ECC71;color:white;">3</span>
+                <span>三大集聚机制 (Marshallian Trinity) —— 集聚如何发生？</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#2ECC71;"></div>
+                    <div>
+                        <div class="theory-label">共享 (Sharing)</div>
+                        <div class="theory-desc">大家一起分摊成本，每个人付的少但享受的多</div>
+                        <div class="theory-example">共享基础设施（道路、港口、电网）、共享供应商（专业化分工）、共享劳动力池（降低招聘/求职成本）</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#2ECC71;"></div>
+                    <div>
+                        <div class="theory-label">匹配 (Matching)</div>
+                        <div class="theory-desc">人越多，找到"对的人"的概率越高、速度越快</div>
+                        <div class="theory-example">更好的劳-岗匹配（技能对口）、更快的匹配速度（职位空缺填充快）、更精准的上下游匹配（供应链效率）</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#2ECC71;"></div>
+                    <div>
+                        <div class="theory-label">学习 (Learning)</div>
+                        <div class="theory-desc">离得近，知识"溢出"得快，创新发生得更频繁</div>
+                        <div class="theory-example">知识溢出（同一个行业的人喝杯咖啡就交换了想法）、干中学（做得多就学得多）、创新加速（专利数随城市规模超线性增长）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layer 4: 扩展机制 -->
+        <div class="framework-layer">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#F39C12;color:white;">4</span>
+                <span>扩展机制 —— 更深层的集聚效应</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#F39C12;"></div>
+                    <div>
+                        <div class="theory-label">本地市场效应 (Home Market Effect)</div>
+                        <div class="theory-desc">需求大的地方吸引更多企业 → 更多选择 → 更低价格 → 更大的需求，形成正反馈循环</div>
+                        <div class="theory-example">例：一线城市外卖选择多 100 倍，配送费反而更低</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#F39C12;"></div>
+                    <div>
+                        <div class="theory-label">网络效应 (Network Effects)</div>
+                        <div class="theory-desc">每个新加入者都让网络对其他人更有价值，城市就是一个巨大的网络</div>
+                        <div class="theory-example">例：Metcalfe's Law — 城市的价值与人口平方成正比</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#F39C12;"></div>
+                    <div>
+                        <div class="theory-label">竞争效应 + 选择效应</div>
+                        <div class="theory-desc">企业集聚加剧竞争 → 效率提升、价格下降（竞争效应）；大城市筛选出效率更高的企业（选择效应）</div>
+                        <div class="theory-example">例：一线城市企业退出率 20% vs 县城 5%，活下来的都是更强的</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layer 5: 度量指标 -->
+        <div class="framework-layer">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#9B59B6;color:white;">5</span>
+                <span>度量指标 —— 如何量化集聚效益？</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#9B59B6;"></div>
+                    <div>
+                        <div class="theory-label">宏观指标 (城市级)</div>
+                        <div class="theory-desc">城市标度律 β (β > 1 即集聚效益)、人口密度、地均 GDP、人均 GDP 随城市规模的变化斜率</div>
+                        <div class="theory-example">本数据家族中 GDP 标度律 β = 1.069，专利申请 β = 1.25</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#9B59B6;"></div>
+                    <div>
+                        <div class="theory-label">中观指标 (产业级)</div>
+                        <div class="theory-desc">区位商 LQ (LQ > 1 表示该产业有比较优势)、EG 指数、HHI、空间基尼系数</div>
+                        <div class="theory-example">大数据城市高科技产业 LQ > 2，传统制造业 LQ < 0.5</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#9B59B6;"></div>
+                    <div>
+                        <div class="theory-label">微观指标 (企业/个体级)</div>
+                        <div class="theory-desc">全要素生产率 TFP (受集聚溢出影响)、工资溢价、企业进入退出率、幸福感曲线</div>
+                        <div class="theory-example">集聚溢出每增加 0.1，企业 TFP 提升约 2%（本数据）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layer 6: 数据家族 -->
+        <div class="framework-layer">
+            <div class="framework-layer-header" onclick="toggleLayer(this)">
+                <span class="layer-num" style="background:#1ABC9C;color:white;">6</span>
+                <span>数据家族 —— 层级化的数据体系</span>
+                <span class="layer-arrow">▼</span>
+            </div>
+            <div class="framework-layer-body">
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#1ABC9C;"></div>
+                    <div>
+                        <div class="theory-label">Tier 1: 跨城市面板数据 (宏观)</div>
+                        <div class="theory-desc">200 城市 × 20 年 × 20+ 指标: 人口、GDP、工资、专利、就业、基础设施</div>
+                        <div class="theory-example">文件: T1_跨城市面板.csv (4,000 条)</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#1ABC9C;"></div>
+                    <div>
+                        <div class="theory-label">Tier 2: 产业集聚数据 (中观)</div>
+                        <div class="theory-desc">200 城市 × 20 产业 × 15 指标: 就业、产值、区位商 LQ、HHI</div>
+                        <div class="theory-example">文件: T2_产业集聚.csv (4,000 条)</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#1ABC9C;"></div>
+                    <div>
+                        <div class="theory-label">Tier 3: 企业微观数据</div>
+                        <div class="theory-desc">5,000 企业 × 30 指标: TFP、集聚溢出、供应链距离、R&D 投入</div>
+                        <div class="theory-example">文件: T3_企业微观.csv (5,000 条)</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#1ABC9C;"></div>
+                    <div>
+                        <div class="theory-label">Tier 4: 个体感知数据</div>
+                        <div class="theory-desc">10,000 居民 × 20 指标: 收入、通勤、社交、孤独感、幸福感</div>
+                        <div class="theory-example">文件: T4_个体感知.csv (10,000 条)</div>
+                    </div>
+                </div>
+                <div class="theory-item">
+                    <div class="theory-dot" style="background:#1ABC9C;"></div>
+                    <div>
+                        <div class="theory-label">Tier 5: 城际联系网络数据</div>
+                        <div class="theory-desc">200 城市间引力模型: 人口流动、资本流动、信息流、供应链、协同创新</div>
+                        <div class="theory-example">文件: T5_城际联系.csv (19,900 条)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- ===== 数据总览 ===== -->
@@ -530,6 +961,186 @@
     </div>
 </section>
 
+<!-- ================================================================== -->
+<!-- ===== 数据家族探索 ===== -->
+<!-- ================================================================== -->
+<section class="section" id="data-family">
+    <h2 class="section-title">数据家族探索</h2>
+    <p class="section-desc">
+        5 个层级、42,900 条记录、100+ 指标，构成完整的集聚效益数据家族<br>
+        每一层都能独立用于分析，也可以跨层联动
+    </p>
+
+    <div class="data-family-summary">
+        <div class="data-family-summary-item">
+            <div class="num">42,900</div>
+            <div class="label">总记录数</div>
+        </div>
+        <div class="data-family-summary-item">
+            <div class="num">5</div>
+            <div class="label">数据层级</div>
+        </div>
+        <div class="data-family-summary-item">
+            <div class="num">200</div>
+            <div class="label">覆盖城市</div>
+        </div>
+        <div class="data-family-summary-item">
+            <div class="num">100+</div>
+            <div class="label">指标总数</div>
+        </div>
+        <div class="data-family-summary-item">
+            <div class="num">β=1.07</div>
+            <div class="label">标度律指数</div>
+        </div>
+    </div>
+
+    <div class="data-family-grid">
+        <!-- Tier 1 -->
+        <div class="data-tier-card" style="border-left: 4px solid #e94560;">
+            <div class="tier-number" style="background:#e94560;color:white;">Tier 1 · 宏观</div>
+            <div class="tier-title">跨城市面板数据</div>
+            <div class="tier-subtitle">200 城市 × 20 年 · 20+ 指标</div>
+            <div class="tier-stats">
+                <span class="tier-stat"><strong>4,000</strong> 条</span>
+                <span class="tier-stat"><strong>20</strong> 年</span>
+            </div>
+            <div class="tier-metrics">
+                <span class="tier-metric">人口</span>
+                <span class="tier-metric">GDP</span>
+                <span class="tier-metric">人均GDP</span>
+                <span class="tier-metric">工资</span>
+                <span class="tier-metric">专利</span>
+                <span class="tier-metric">就业率</span>
+                <span class="tier-metric">企业数</span>
+                <span class="tier-metric">基础设施</span>
+                <span class="tier-metric">医疗资源</span>
+                <span class="tier-metric">教育投入</span>
+            </div>
+            <div class="tier-files">
+                <span class="tier-file">T1_跨城市面板.csv</span>
+            </div>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="data-tier-card" style="border-left: 4px solid #3498DB;">
+            <div class="tier-number" style="background:#3498DB;color:white;">Tier 2 · 中观</div>
+            <div class="tier-title">产业集聚数据</div>
+            <div class="tier-subtitle">200 城市 × 20 产业 · 15 指标</div>
+            <div class="tier-stats">
+                <span class="tier-stat"><strong>4,000</strong> 条</span>
+                <span class="tier-stat"><strong>3</strong> 种产业类型</span>
+            </div>
+            <div class="tier-metrics">
+                <span class="tier-metric">就业人数</span>
+                <span class="tier-metric">产业产值</span>
+                <span class="tier-metric">区位商 LQ</span>
+                <span class="tier-metric">HHI 指数</span>
+                <span class="tier-metric">企业数量</span>
+                <span class="tier-metric">平均工资</span>
+            </div>
+            <div class="tier-files">
+                <span class="tier-file">T2_产业集聚.csv</span>
+            </div>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="data-tier-card" style="border-left: 4px solid #2ECC71;">
+            <div class="tier-number" style="background:#2ECC71;color:white;">Tier 3 · 微观</div>
+            <div class="tier-title">企业微观数据</div>
+            <div class="tier-subtitle">5,000 家企业 · 30 指标</div>
+            <div class="tier-stats">
+                <span class="tier-stat"><strong>5,000</strong> 条</span>
+                <span class="tier-stat"><strong>4</strong> 种规模类型</span>
+            </div>
+            <div class="tier-metrics">
+                <span class="tier-metric">全要素生产率 TFP</span>
+                <span class="tier-metric">集聚溢出效应</span>
+                <span class="tier-metric">供应链距离</span>
+                <span class="tier-metric">R&D 投入</span>
+                <span class="tier-metric">出口比例</span>
+                <span class="tier-metric">利润率</span>
+            </div>
+            <div class="tier-files">
+                <span class="tier-file">T3_企业微观.csv</span>
+            </div>
+        </div>
+
+        <!-- Tier 4 -->
+        <div class="data-tier-card" style="border-left: 4px solid #F39C12;">
+            <div class="tier-number" style="background:#F39C12;color:white;">Tier 4 · 感知</div>
+            <div class="tier-title">个体感知数据</div>
+            <div class="tier-subtitle">10,000 居民 · 20 指标</div>
+            <div class="tier-stats">
+                <span class="tier-stat"><strong>10,000</strong> 条</span>
+                <span class="tier-stat"><strong>5</strong> 个年龄组</span>
+            </div>
+            <div class="tier-metrics">
+                <span class="tier-metric">月收入</span>
+                <span class="tier-metric">房租</span>
+                <span class="tier-metric">通勤时间</span>
+                <span class="tier-metric">社交网络</span>
+                <span class="tier-metric">孤独感</span>
+                <span class="tier-metric">幸福感</span>
+            </div>
+            <div class="tier-files">
+                <span class="tier-file">T4_个体感知.csv</span>
+            </div>
+        </div>
+
+        <!-- Tier 5 -->
+        <div class="data-tier-card" style="border-left: 4px solid #9B59B6;">
+            <div class="tier-number" style="background:#9B59B6;color:white;">Tier 5 · 网络</div>
+            <div class="tier-title">城际联系网络数据</div>
+            <div class="tier-subtitle">200 城市间联系 · 引力模型</div>
+            <div class="tier-stats">
+                <span class="tier-stat"><strong>19,900</strong> 条</span>
+                <span class="tier-stat"><strong>5</strong> 种联系类型</span>
+            </div>
+            <div class="tier-metrics">
+                <span class="tier-metric">人口流动</span>
+                <span class="tier-metric">资本流动</span>
+                <span class="tier-metric">信息流指数</span>
+                <span class="tier-metric">供应链强度</span>
+                <span class="tier-metric">协同专利</span>
+            </div>
+            <div class="tier-files">
+                <span class="tier-file">T5_城际联系.csv</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 应用场景 -->
+    <div class="chart-container" style="margin-top: 2rem;">
+        <h3 style="margin-bottom:1rem;font-size:1.1rem;">数据家族应用场景</h3>
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">📈 城市经济学研究</div>
+                <div class="card-unit" style="margin-top:0.5rem;">Tier 1 + Tier 2 → 计算标度律、验证集聚效益、分析产业结构</div>
+            </div>
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">🏭 产业政策分析</div>
+                <div class="card-unit" style="margin-top:0.5rem;">Tier 2 + Tier 3 → 识别优势产业、评估集群效应、制定产业政策</div>
+            </div>
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">🏠 个人生活决策</div>
+                <div class="card-unit" style="margin-top:0.5rem;">Tier 4 → 收入 vs 房租对比、幸福感曲线、城市选择权衡</div>
+            </div>
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">🔗 网络科学分析</div>
+                <div class="card-unit" style="margin-top:0.5rem;">Tier 5 → 城市网络中心度、社团检测、引力模型拟合</div>
+            </div>
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">📊 教育/科普演示</div>
+                <div class="card-unit" style="margin-top:0.5rem;">全家族 → 跨层级联动分析，展示"宏观→微观"的完整传导链</div>
+            </div>
+            <div class="card">
+                <div class="card-title" style="font-size:1rem;">🤖 机器学习建模</div>
+                <div class="card-unit" style="margin-top:0.5rem;">全家族 → 预测城市增长、分类产业集群、聚类城市类型</div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <footer>
     集聚效益可视化 · 基于模拟数据 · 200个城市样本 · 20+生活维度<br>
     数据为模拟生成，用于展示分析框架和方法 · 实际应用可替换为真实数据源
@@ -742,6 +1353,12 @@ function initFood() {
 // ===== 滚动 =====
 function scrollToSection(id) {
     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 知识框架折叠 =====
+function toggleLayer(header) {
+    const layer = header.parentElement;
+    layer.classList.toggle('open');
 }
 
 // ===== 初始化所有图表 =====
